@@ -15,11 +15,29 @@ namespace ProcessListApplication
     {
         static void Main(string[] args)
         {
-            String hostname = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
+            updateSessionList(334);
+
+
+            Console.WriteLine(GetProcessList(0));
+
+            Console.ReadLine();
+        }
+
+        static int updateSessionList(int eventId)
+        {
+            Db db = null;
+            if (db == null)
+            {
+                db = new Db();
+            }
+
+            String hostname = System.Environment.MachineName;
             ITerminalServicesManager manager = new TerminalServicesManager();
+            int userSessionNum = 0;
             using (ITerminalServer server = manager.GetRemoteServer(hostname))
             {
                 server.Open();
+                db.nQuery("DELETE FROM `sessions` WHERE hostname = @hostname", new string[] { "hostname", hostname });
                 foreach (ITerminalServicesSession session in server.GetSessions())
                 {
                     NTAccount account = session.UserAccount;
@@ -27,15 +45,21 @@ namespace ProcessListApplication
 
                     if (account != null)
                     {
-                        Console.WriteLine(String.Format("{0} {1}", session.SessionId, account));
+                        db.bind(new string[] { "hostname", hostname, "sessionId", session.SessionId.ToString(), "account", account.ToString(), "eventId", eventId.ToString() });
+                        Console.WriteLine(String.Format("{0} {1} {2} {3}", session.SessionId, account, hostname, eventId));
+                        int created = db.nQuery("INSERT INTO `sessions` (`event_id`, `hostname`, `session_id`, `account`) VALUES  "
+                 + " (@eventId, @hostname, @sessionId, @account)");
+                        userSessionNum++;
                     }
                 }
             }
 
+            if (userSessionNum == 0)
+            {
+                return 0;
+            }
 
-            Console.WriteLine(GetProcessList(0));
-
-            Console.ReadLine();
+            return 1;
         }
 
         static void useDb()
@@ -111,6 +135,17 @@ namespace ProcessListApplication
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
             ManagementObjectCollection processList = searcher.Get();
 
+            string hostname = System.Environment.MachineName;
+
+
+
+            Db db = null;
+            if (db == null)
+            {
+                db = new Db();
+            }
+
+            db.nQuery("DELETE FROM `processes` WHERE hostname = @hostname", new string[] { "hostname", hostname });
             foreach (ManagementObject obj in processList)
             {
                 try
@@ -126,24 +161,33 @@ namespace ProcessListApplication
 
                     int SessionId = Convert.ToInt32(obj.GetPropertyValue("SessionId"));
                     int processId = Convert.ToInt32(obj.GetPropertyValue("ProcessId"));
-                    string owner = GetProcessOwner(processId);
-                    string name = System.Environment.MachineName;
+                    //string owner = GetProcessOwner(processId);
+                    string owner = "abc";
 
-                    Console.WriteLine(String.Format("{5} {0} {1} {2} {4} {3} {6}", SessionId, processId, caption, executablepath, owner, name, create_dt));
+
+                    // Create/Insert
+                    db.bind(new string[] { "hostname", hostname, "sessionId", SessionId.ToString(), "caption", caption, "executablepath", executablepath,
+                         "create_dt", create_dt.ToString(), "owner", owner, "processId", processId.ToString()
+                    });
+
+                    int created = db.nQuery("INSERT INTO `processes` (`hostname`, `session_id`, `process_id`,`caption`, `owner`, `executable_path`, `creation_date`) VALUES "
+                       + " (@hostname, @sessionId, @processId, @caption, @owner, @executablepath, @create_dt)");
+
+                    Console.WriteLine(String.Format("{7} {5} {0} {1} {2} {4} {3} {6}", SessionId, processId, caption, executablepath, owner, hostname, create_dt, created));
                 }
                 catch (Exception ex)
                 {
+                    db.CloseConn();
                     string exception = "Exception : " + ex.Message.ToString() + "\n\rApplication will close now. \n\r";
                     Console.WriteLine(exception + "/n/r");
                     Console.ReadLine();
                     Environment.Exit(1);
                 }
 
-
+                db.CloseConn();
             }
 
             return "amtf";
         }
-
     }
 }
