@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ProcessListApplication.Properties {
+namespace ConsoleApplication1.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -25,7 +25,7 @@ namespace ProcessListApplication.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Server=192.168.61.1;Database=test;Uid=asan;Pwd=asan;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Server=192.168.61.1;Database=process_info;Uid=asan;Pwd=asan;")]
         public string connectionstring {
             get {
                 return ((string)(this["connectionstring"]));

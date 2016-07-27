@@ -18,7 +18,7 @@ namespace ProcessListApplication
         private MySqlDataReader reader;
 
         //
-        private string connectiondetails = Properties.Settings.Default["connectionstring"].ToString();
+        private string connectiondetails = ConsoleApplication1.Properties.Settings.Default["connectionstring"].ToString();
 
         //
         private bool bConnected = false;

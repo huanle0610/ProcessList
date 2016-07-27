@@ -162,7 +162,7 @@ namespace ProcessListApplication
                     int SessionId = Convert.ToInt32(obj.GetPropertyValue("SessionId"));
                     int processId = Convert.ToInt32(obj.GetPropertyValue("ProcessId"));
                     //string owner = GetProcessOwner(processId);
-                    string owner = "abc";
+                    string owner = "unknown";
 
 
                     // Create/Insert

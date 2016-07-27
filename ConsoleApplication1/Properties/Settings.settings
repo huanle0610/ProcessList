@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="connectionstring" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Server=192.168.61.1;Database=test;Uid=asan;Pwd=asan;</Value>
+      <Value Profile="(Default)">Server=192.168.61.1;Database=process_info;Uid=asan;Pwd=asan;</Value>
     </Setting>
   </Settings>
 </SettingsFile>
